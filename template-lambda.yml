@@ -1,0 +1,65 @@
+# Deploys ClamAV as a Lambda function
+# Pre-condition: Zip library is build and stored in the artifact bucket
+# Build instructions: https://github.com/upsidetravel/bucket-antivirus-function
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Deploy fetch Lambda function."
+Parameters:
+  #Description: Select Environmet (TEST, LT, UAT)
+  EnvironmentName:
+    Type: String
+    Default: TEST
+    AllowedValues:
+      - TEST
+Mappings: 
+  EnvironmentDefinition:
+    TEST:
+      "S3CodeBucket" : "code-bachlmayr"
+      "S3CodeKey" : "fetch.zip"
+      "PolicyName" : "FetchDataPolicy"
+Resources:
+# ------------------------------------------------- DEFINE ROLE
+  FetchRole:                                       # Role name
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal: 
+              Service:
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+  RolePolicies:
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyName: !FindInMap [EnvironmentDefinition, !Ref EnvironmentName, PolicyName]
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Action: 
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+            - "s3:*"
+            Resource: "*"
+            Effect: "Allow"
+      Roles: 
+        - 
+          Ref: "FetchRole"
+  FetchFunction:                                        # Lambda function 1: Fetch Data
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Handler: "fetch"                             # TODO: handler
+      Role: !GetAtt [ FetchRole, Arn ]
+      Code:
+        S3Bucket: !FindInMap [EnvironmentDefinition, !Ref EnvironmentName, S3CodeBucket]  
+        S3Key: !FindInMap [EnvironmentDefinition, !Ref EnvironmentName, S3CodeKey]
+      Runtime: "go1.x"
+      Timeout: "10"
+      MemorySize: 128
+      Environment:
+        Variables:
+          LOG_LEVEL: "debug"

@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates an API GW for the lambda functions"
+
+Resources:
+  DataFetchApi:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: "DataFetchApi"
+      FailOnWarnings: "true"
+  DataFetchResource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - "DataFetchApi"
+          - "RootResourceId"
+      PathPart: "fetch"
+      RestApiId:
+        Ref: DataFetchApi
+  CreateAccountMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      HttpMethod: "GET"
+      AuthorizationType: "NONE"
+      ResourceId:
+        Ref: DataFetchResource
+      RestApiId:
+        Ref: DataFetchApi
+      Integration:
+        Type: "AWS"
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:aws:apigateway:"
+              - !Ref "AWS::Region"
+              - ":lambda:path/"
+              - "/2015-03-31/functions/"
+              - Fn::GetAtt:
+                - CreateAccountLambdaFunction
+                - Arn
+              - "/invocations"
+        IntegrationHttpMethod: "GET"
+  CreateAccountLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: dataFetch
+      Code:
+        S3Bucket: code-bachlmayr
+        S3Key: 5cf0dcdbf003def02ce032fb26eca244
+      Handler: endpoints/dataFetch/index.handler
+      Role: !GetAtt [ AvBusinessProcessRole, Arn ]
+      Runtime: nodejs8.10
+      MemorySize: 128
+      Timeout: 10
+
+  DataFetchRole:                                             
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal: 
+              Service:
+                - "lambda.amazonaws.com"
+                - "s3.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+  
+  RolePolicies:
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyName: "DataFetchPolicy"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Action: 
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+            - "s3:*"
+            Resource: "*"
+            Effect: "Allow"
+      Roles: 
+        - 
+          Ref: "DataFetchRole"
