@@ -37,7 +37,7 @@ phases:
       # Build application
       #- cd "/go/src/${PACKAGE}"
       #- go build -a src/fetch.go
-      - go build -o fetch
+      - go build -a fetch
 
       # Package our application with AWS SAM
       - echo start packaging ${S3_BUCKET}
@@ -55,10 +55,11 @@ phases:
   post_build:
     commands:
       - echo starting the post_build phase, but not really
-      - aws cloudformation create-stack --stack-name fetch --template-url https://s3-ap-southeast-2.amazonaws.com/code-bachlmayr/template-lambda.yml --capabilities CAPABILITY_IAM
+      #- aws cloudformation create-stack --stack-name fetch --template-url https://s3-ap-southeast-2.amazonaws.com/code-bachlmayr/template-lambda.yml --capabilities CAPABILITY_IAM
     finally:
       - echo end of post_build phase
 
 artifacts:
   files:
     - packaged.yml
+    - fetch.zip
