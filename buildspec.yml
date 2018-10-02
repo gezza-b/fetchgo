@@ -36,7 +36,7 @@ phases:
       - echo starting the build phase
       # Build application
       - cd "/go/src/${PACKAGE}"
-      - go build -a src/fetch.go
+      - go build -a fetch.go
       #- go build -o fetch
 
       # Package our application with AWS SAM
