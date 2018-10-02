@@ -37,7 +37,7 @@ phases:
       # Build application
       #- cd "/go/src/${PACKAGE}"
       #- go build -a src/fetch.go
-      - go build -o  fetch
+      - go build -o fetch
 
       # Package our application with AWS SAM
       - echo start packaging ${S3_BUCKET}
@@ -45,7 +45,7 @@ phases:
      
       # copy CFN template
       - echo start copying ${CODEBUILD_SRC_DIR}/template-lambda.yml
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/template-lambda.yml s3://zip-bachlmayr/template-lambda.yml
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/template-lambda.yml s3://${S3_BUCKET}/template-lambda.yml
     
     finally:
       - echo end of build phase
@@ -53,6 +53,11 @@ phases:
   post_build:
     commands:
       - echo starting the post_build phase, but not really
-      - aws cloudformation create-stack --stack-name fetch --template-url https://code-bachlmayr.s3.amazonaws.com/template-lambda.yml --capabilities CAPABILITY_IAM
+      - aws cloudformation create-stack --stack-name fetch --template-url https://${S3_BUCKET}.s3.amazonaws.com/template-lambda.yml --capabilities CAPABILITY_IAM
     finally:
       - echo end of post_build phase
+
+artifacts:
+  files:
+    - packaged.yml
+    #- template-lambda.yml
