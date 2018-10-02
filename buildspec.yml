@@ -41,11 +41,11 @@ phases:
 
       # Package our application with AWS SAM
       - echo start packaging ${S3_BUCKET}
-      - aws cloudformation package --template-file template-lambda.yml --s3-bucket ${S3_BUCKET} --output-template-file packaged.yml
+      - aws cloudformation package --template-file template-lambda.yml --s3-bucket code-bachlmayr --output-template-file packaged.yml
      
       # copy CFN template
       - echo start copying ${CODEBUILD_SRC_DIR}/template-lambda.yml
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/template-lambda.yml s3://${S3_BUCKET}/template-lambda.yml
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/template-lambda.yml s3://code-bachlmayr/template-lambda.yml
     
     finally:
       - echo end of build phase
@@ -53,7 +53,7 @@ phases:
   post_build:
     commands:
       - echo starting the post_build phase, but not really
-      - aws cloudformation create-stack --stack-name fetch --template-url https://${S3_BUCKET}.s3.amazonaws.com/template-lambda.yml --capabilities CAPABILITY_IAM
+      - aws cloudformation create-stack --stack-name fetch --template-url https://code-bachlmayr.s3.amazonaws.com/template-lambda.yml --capabilities CAPABILITY_IAM
     finally:
       - echo end of post_build phase
 
