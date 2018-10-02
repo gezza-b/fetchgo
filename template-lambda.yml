@@ -1,6 +1,4 @@
-# Deploys ClamAV as a Lambda function
-# Pre-condition: Zip library is build and stored in the artifact bucket
-# Build instructions: https://github.com/upsidetravel/bucket-antivirus-function
+# Deploys the Fetch Lambda function
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Deploy fetch Lambda function."
 Parameters:
