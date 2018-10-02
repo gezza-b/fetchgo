@@ -7,6 +7,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+type MyEvent struct {
+	Name string `json:"name"`
+}
+
 func main() {
 	fmt.Println("main::")
 	lambda.Start(Handler)
@@ -17,7 +21,7 @@ func main() {
 // 	return events.APIGatewayProxyResponse{Body: request.Body, StatusCode: 200}, nil
 // }
 
-func Handler(ctx context.Context, name string) (string, error) {
-	fmt.Println("handler:: ", name)
+func Handler(ctx context.Context, name MyEvent) (string, error) {
+	fmt.Println("handler:: ")
 	return "hi", nil
 }

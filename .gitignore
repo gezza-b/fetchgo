@@ -4,3 +4,5 @@
 /pkg/**
 /build/**
 /src/fetch
+/pkg/**
+/src/bin/**
