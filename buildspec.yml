@@ -36,7 +36,7 @@ phases:
       - echo starting the build phase
       # Build application
       - cd "/go/src/${PACKAGE}"
-      - go get -t ./..
+      #- go get ./..
       - go build -o src/fetch.go
       #- go build -o fetch
 
