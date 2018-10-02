@@ -45,7 +45,7 @@ phases:
      
       # copy CFN template
       - echo start copying ${CODEBUILD_SRC_DIR}/template-lambda.yml
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/template.yml s3://zip-bachlmayr/template.yml
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/template-lambda.yml s3://zip-bachlmayr/template-lambda.yml
     
     finally:
       - echo end of build phase
